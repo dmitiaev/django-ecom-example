@@ -15,8 +15,8 @@ from .models import (
     Payment
 )
 
-import stripe
-stripe.api_key = settings.STRIPE_KEY
+# import stripe
+# stripe.api_key = settings.STRIPE_KEY
 
 # Create your views here.
 class HomeView(ListView):
