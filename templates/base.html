@@ -2,88 +2,73 @@
 
 {% load cart_template_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Djanggo Ecommerce</title>
+  <title>Электронная Коммерция Django</title>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
   <!-- Bootstrap core CSS -->
   <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
   <!-- Material Design Bootstrap -->
   <link href="{% static 'css/mdb.min.css' %}" rel="stylesheet">
-  <!-- Your custom styles (optional) -->
-  <link href=" {% static 'css/style.min.css' %}" rel="stylesheet">
+  <!-- Ваши пользовательские стили (по желанию) -->
+  <link href="{% static 'css/style.min.css' %}" rel="stylesheet">
   <style type="text/css">
-    html,
-    body,
-    header,
-    .carousel {
+    html, body, header, .carousel {
       height: 60vh;
     }
 
     @media (max-width: 740px) {
-
-      html,
-      body,
-      header,
-      .carousel {
+      html, body, header, .carousel {
         height: 100vh;
       }
     }
 
     @media (min-width: 800px) and (max-width: 850px) {
-
-      html,
-      body,
-      header,
-      .carousel {
+      html, body, header, .carousel {
         height: 100vh;
       }
     }
-
   </style>
 
-
-    {% block extra_head %}
-    {% endblock extra_head %}
+  {% block extra_head %}
+  {% endblock extra_head %}
 
 </head>
 
 <body>
 
-  <!-- Navbar -->
+  <!-- Навигационная панель -->
   <nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
     <div class="container">
 
-      <!-- Brand -->
+      <!-- Бренд -->
       <a class="navbar-brand waves-effect" href="/">
-        <strong class="blue-text">DJANGO</strong>
+        <strong class="blue-text">Магазин Синих Рубашек</strong>
       </a>
 
       <!-- Collapse -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключить навигацию">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Links -->
+      <!-- Ссылки -->
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-        <!-- Left -->
+        <!-- Слева -->
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-          
+            <!-- Ваши ссылки и элементы меню -->
           </li>
         </ul>
 
-        <!-- Right -->
+        <!-- Справа -->
         <ul class="navbar-nav nav-flex-icons">
-          
-         
             {% if user.is_authenticated %}
             <li class="nav-item">
                 <a href="{% url 'core:order-summary' %}" class="nav-link waves-effect">
@@ -91,20 +76,18 @@
                   <span class="badge red z-depth-1 mr-1"> {{ request.user|cart_item_count }} </span>
                 {% endif %}
                 <i class="fas fa-shopping-cart"></i>
-                <span class="clearfix d-none d-sm-inline-block"> Cart </span>
+                <span class="clearfix d-none d-sm-inline-block"> Корзина </span>
                 </a>
             </li>
             <li class="nav-item">
-                 <a class="nav-link waves-effect">
-                Hi {{ user.username }}!
-                </a>
+                <a class="nav-link waves-effect">Привет, {{ user.username }}!</a>
             </li>
-             </li class="nav-item">
-                <a class="nav-link waves-effect" href="{% url 'logout' %}"> logout</a>
+            <li class="nav-item">
+                <a class="nav-link waves-effect" href="{% url 'logout' %}"> Выйти</a>
             </li>
             {% else %}
-             </li class="nav-item">
-                <a class="nav-link waves-effect" href="{% url 'login' %}"> login</a>
+            <li class="nav-item">
+                <a class="nav-link waves-effect" href="{% url 'login' %}"> Войти</a>
             </li>
             {% endif %}
         </ul>
@@ -113,7 +96,8 @@
 
     </div>
   </nav>
-  <!-- Navbar -->
+  <!-- Навигационная панель -->
+
   <div class="mt-5 pt-4">
     {% if messages %}
       {% for message in messages %}
@@ -122,18 +106,17 @@
         </div>
       {% endfor %}
     {% endif %}
-    </div>
+  </div>
 
-    {% block content %}
-    {% endblock content %}
+  {% block content %}
+  {% endblock content %}
 
-    {% include "footer.html" %}
+  {% include "footer.html" %}
 
+  {% include "script.html" %}
 
-    {% include "script.html" %}
-
-    {% block extra_script %}
-    {% endblock extra_script %}
+  {% block extra_script %}
+  {% endblock extra_script %}
 
 </body>
 

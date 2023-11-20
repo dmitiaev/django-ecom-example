@@ -4,14 +4,14 @@ from django.shortcuts import reverse
 from django_countries.fields import CountryField
 
 CATEGORY = (
-    ('S', 'Shirt'),
-    ('SP', 'Sport Wear'),
-    ('OW', 'Out Wear')
+    ('S', 'Рубашка'),
+    ('SP', 'Спортивная одежда'),
+    ('OW', 'Верхняя одежда')
 )
 
 LABEL = (
-    ('N', 'New'),
-    ('BS', 'Best Seller')
+    ('N', 'Новинка'),
+    ('BS', 'Бестселлер')
 )
 
 class Item(models.Model):

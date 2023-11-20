@@ -25,7 +25,7 @@ SECRET_KEY = '@0%m5m+aal2i_^87$adi_2kjnm4*=htv&%kv3qxi*nueni%c1k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['2a31-109-175-246-158.ngrok-free.app', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'DjangoEcommerce.urls'
@@ -112,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'RU-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -146,4 +147,6 @@ LOGOUT_REDIRECT_URL = '/'
 
 #stripe payment
 STRIPE_KEY = ''
+
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app','https://*.127.0.0.1']
 
