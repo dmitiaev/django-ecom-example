@@ -4,20 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0017_order_payment'),
+        ("core", "0017_order_payment"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='item',
-            name='category',
-            field=models.CharField(choices=[('S', 'Рубашка'), ('SP', 'Спортивная одежда'), ('OW', 'Верхняя одежда')], max_length=2),
+            model_name="item",
+            name="category",
+            field=models.CharField(
+                choices=[
+                    ("S", "Рубашка"),
+                    ("SP", "Спортивная одежда"),
+                    ("OW", "Верхняя одежда"),
+                ],
+                max_length=2,
+            ),
         ),
         migrations.AlterField(
-            model_name='item',
-            name='label',
-            field=models.CharField(choices=[('N', 'Новинка'), ('BS', 'Бестселлер')], max_length=2),
+            model_name="item",
+            name="label",
+            field=models.CharField(
+                choices=[("N", "Новинка"), ("BS", "Бестселлер")], max_length=2
+            ),
         ),
     ]

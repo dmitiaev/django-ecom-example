@@ -3,16 +3,10 @@ from django.db import models
 from django.shortcuts import reverse
 from django_countries.fields import CountryField
 
-CATEGORY = (
-    ('S', 'Рубашка'),
-    ('SP', 'Спортивная одежда'),
-    ('OW', 'Верхняя одежда')
-)
+CATEGORY = (("S", "Рубашка"), ("SP", "Спортивная одежда"), ("OW", "Верхняя одежда"))
 
-LABEL = (
-    ('N', 'Новинка'),
-    ('BS', 'Бестселлер')
-)
+LABEL = (("N", "Новинка"), ("BS", "Бестселлер"))
+
 
 class Item(models.Model):
     item_name = models.CharField(max_length=100)
@@ -26,24 +20,17 @@ class Item(models.Model):
         return self.item_name
 
     def get_absolute_url(self):
-        return reverse("core:product", kwargs={
-            "pk" : self.pk
-        
-        })
+        return reverse("core:product", kwargs={"pk": self.pk})
 
     def get_add_to_cart_url(self):
-        return reverse("core:add-to-cart", kwargs={
-            "pk" : self.pk
-        })
+        return reverse("core:add-to-cart", kwargs={"pk": self.pk})
 
     def get_remove_from_cart_url(self):
-        return reverse("core:remove-from-cart", kwargs={
-            "pk" : self.pk
-        })
+        return reverse("core:remove-from-cart", kwargs={"pk": self.pk})
+
 
 class OrderItem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ordered = models.BooleanField(default=False)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
@@ -64,8 +51,7 @@ class OrderItem(models.Model):
         if self.item.discount_price:
             return self.get_discount_item_price()
         return self.get_total_item_price()
-    
-    
+
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -74,18 +60,23 @@ class Order(models.Model):
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     checkout_address = models.ForeignKey(
-        'CheckoutAddress', on_delete=models.SET_NULL, blank=True, null=True)
+        "CheckoutAddress", on_delete=models.SET_NULL, blank=True, null=True
+    )
     payment = models.ForeignKey(
-        'Payment', on_delete=models.SET_NULL, blank=True, null=True)
+        "Payment", on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     def __str__(self):
         return self.user.username
-    
+
     def get_total_price(self):
         total = 0
         for order_item in self.items.all():
             total += order_item.get_final_price()
         return total
+
+    def to_yookassa_payload(self) -> dict:
+        return {}
 
 
 class CheckoutAddress(models.Model):
@@ -97,14 +88,15 @@ class CheckoutAddress(models.Model):
 
     def __str__(self):
         return self.user.username
-    
+
+
 class Payment(models.Model):
     stripe_id = models.CharField(max_length=50)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, 
-                             on_delete=models.SET_NULL, blank=True, null=True)
-    amount = models.FloatField()
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username
-    

@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0003_auto_20200205_1018'),
+        ("core", "0003_auto_20200205_1018"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='item',
-            name='label',
-            field=models.CharField(choices=[('N', 'New'), ('BS', 'Best Seller')], max_length=2),
+            model_name="item",
+            name="label",
+            field=models.CharField(
+                choices=[("N", "New"), ("BS", "Best Seller")], max_length=2
+            ),
         ),
     ]

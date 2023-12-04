@@ -1,11 +1,5 @@
 from django.contrib import admin
-from .models import (
-    Item, 
-    OrderItem, 
-    Order,
-    CheckoutAddress,
-    Payment
-)
+from .models import Item, OrderItem, Order, CheckoutAddress, Payment
 
 admin.site.register(Item)
 admin.site.register(OrderItem)

@@ -5,15 +5,19 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('core', '0014_checkoutaddress'),
+        ("core", "0014_checkoutaddress"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='checkout_address',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.CheckoutAddress'),
+            model_name="order",
+            name="checkout_address",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.CheckoutAddress",
+            ),
         ),
     ]
