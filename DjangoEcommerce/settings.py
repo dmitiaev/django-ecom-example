@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from yookassa import Configuration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = "@0%m5m+aal2i_^87$adi_2kjnm4*=htv&%kv3qxi*nueni%c1k"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["2a31-109-175-246-158.ngrok-free.app", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["5147-109-175-246-158.ngrok-free.app", "127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -143,5 +144,21 @@ LOGOUT_REDIRECT_URL = "/"
 
 YOOKASSA_SECRET_KEY = "test_bIIt9of06oA1KlzOFXqDKMy-rSX1_18jGYzjuP7yQH8"
 YOOKASSA_ACCOUNT_ID = "288106"
+
+
+Configuration.account_id = YOOKASSA_ACCOUNT_ID
+Configuration.secret_key = YOOKASSA_SECRET_KEY
+
+
+YOOKASSA_REDIRECT_URL = "https://5147-109-175-246-158.ngrok-free.app"
+YOOKASSA_DEFAULT_PAYLOAD = {
+    "capture": False,
+    "confirmation": {
+        "type": "redirect",
+        "return_url": YOOKASSA_REDIRECT_URL,
+    },
+}
+YOOKASSA_CURRENCY = "RUB"
+
 
 CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://*.127.0.0.1"]

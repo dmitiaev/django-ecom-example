@@ -7,7 +7,7 @@ from .views import (
     HomeView,
     OrderSummaryView,
     CheckoutView,
-    PaymentView,
+    PaymentView, NotificationView,
 )
 
 app_name = "core"
@@ -23,4 +23,5 @@ urlpatterns = [
     path(
         "reduce-quantity-item/<pk>/", reduce_quantity_item, name="reduce-quantity-item"
     ),
+    path("notifications", NotificationView.as_view(), name="notifications")
 ]

@@ -1,14 +1,19 @@
-from django.conf import settings
+import uuid
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, DetailView, View
+import yookassa
+
 from .forms import CheckoutForm
 from .models import Item, Order, OrderItem, CheckoutAddress, Payment
-import yookassa
 
 
 # Create your views here.
@@ -81,45 +86,50 @@ class PaymentView(View):
 
     def post(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
-        token = self.request.POST.get("stripeToken")
-        amount = int(order.get_total_price() * 100)  # копейки
 
-        try:
-            charge = stripe.Charge.create(amount=amount, currency="usd", source=token)
+        idempotence_key = str(uuid.uuid4())
+        payload = order.to_yookassa_payload()
+        yookassa_payment = yookassa.Payment.create(payload, idempotence_key)
 
-            # create payment
-            payment = Payment()
-            payment.stripe_id = charge["id"]
-            payment.user = self.request.user
-            payment.amount = order.get_total_price()
-            payment.save()
+        # create payment
+        payment = Payment()
+        payment.stripe_id = yookassa_payment.id
+        payment.user = self.request.user
+        payment.amount = int(float(payload['amount']['value']))
+        payment.save()
 
-            # assign payment to order
-            order.ordered = True
-            order.payment = payment
-            order.save()
+        # assign payment to order
+        order.ordered = True
+        order.payment = payment
+        order.save()
 
-            messages.success(self.request, "Success make an order")
-            return redirect("/")
+        messages.success(self.request, "Success make an order")
+        return redirect(yookassa_payment.confirmation.confirmation_url)
 
-        except Exception:
-            # Something else happened, completely unrelated to Stripe
-            messages.error(self.request, "Not identified error")
-            return redirect("/")
 
+@method_decorator(csrf_exempt, name='dispatch')
+class NotificationView(View):
+    def post(self, *args, **kwargs):
+        print(self.request.body)
+        return HttpResponse(status=200)
+
+    def get(self):
+        print("Hello, World!")
+        return redirect("/")
 
 @login_required
 def add_to_cart(request, pk):
     item = get_object_or_404(Item, pk=pk)
-    order_item, created = OrderItem.objects.get_or_create(
-        item=item, user=request.user, ordered=False
-    )
     order_qs = Order.objects.filter(user=request.user, ordered=False)
 
     if order_qs.exists():
         order = order_qs[0]
 
-        if order.items.filter(item__pk=item.pk).exists():
+        order_item, created = OrderItem.objects.get_or_create(
+            item=item, order__pk=order.id, user=request.user
+        )
+
+        if order.items.filter(item__pk=item.pk, order__pk=order.id).exists():
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "Added quantity Item")
@@ -131,6 +141,10 @@ def add_to_cart(request, pk):
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(user=request.user, ordered_date=ordered_date)
+        order_item = OrderItem.objects.create(
+            item=item, user=request.user, order=order
+        )
+
         order.items.add(order_item)
         messages.info(request, "Item added to your cart")
         return redirect("core:order-summary")

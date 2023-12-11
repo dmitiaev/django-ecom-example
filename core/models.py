@@ -52,6 +52,21 @@ class OrderItem(models.Model):
             return self.get_discount_item_price()
         return self.get_total_item_price()
 
+    def to_yookassa_item(self) -> dict:
+        item_price = self.item.discount_price or self.item.price
+        return {
+            "description": self.item.description,
+            "quantity": f'{self.quantity:.2f}',
+            "amount": {
+                "value": f'{item_price:.2f}',
+                "currency": settings.YOOKASSA_CURRENCY,
+            },
+            "vat_code": "4",
+            "payment_mode": "full_payment",
+            "payment_subject": "marked",
+            "measure": "piece",
+        }
+
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -76,7 +91,24 @@ class Order(models.Model):
         return total
 
     def to_yookassa_payload(self) -> dict:
-        return {}
+        items = []
+        amount_value = 0.0
+        for order_item in self.items.all():
+            amount_value += order_item.get_final_price()
+            items.append(order_item.to_yookassa_item())
+
+        return {
+            **settings.YOOKASSA_DEFAULT_PAYLOAD,
+            "amount": {
+                "value": f'{amount_value:.2f}',
+                "currency": settings.YOOKASSA_CURRENCY,
+            },
+            "description": f"Заказ №{self.id}",
+            "receipt": {"customer": {"email": self.user.email}, "items": items},
+            "metadata": {
+                "oder_id": self.id
+            }
+        }
 
 
 class CheckoutAddress(models.Model):
