@@ -162,18 +162,17 @@ class PaymentView(View):
 
 @login_required
 def add_to_cart(request, pk):
-    item = get_object_or_404(Item, pk=pk )
-    order_item, created = OrderItem.objects.get_or_create(
-        item = item,
-        user = request.user,
-        ordered = False
-    )
+    item = get_object_or_404(Item, pk=pk)
     order_qs = Order.objects.filter(user=request.user, ordered=False)
 
     if order_qs.exists():
         order = order_qs[0]
 
-        if order.items.filter(item__pk=item.pk).exists():
+        order_item, created = OrderItem.objects.get_or_create(
+            item=item, order__pk=order.id, user=request.user
+        )
+
+        if order.items.filter(item__pk=item.pk, order__pk=order.id).exists():
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "Added quantity Item")
@@ -185,51 +184,49 @@ def add_to_cart(request, pk):
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(user=request.user, ordered_date=ordered_date)
+        order_item = OrderItem.objects.create(
+            item=item, user=request.user, order=order
+        )
+
         order.items.add(order_item)
         messages.info(request, "Item added to your cart")
         return redirect("core:order-summary")
 
+
 @login_required
 def remove_from_cart(request, pk):
-    item = get_object_or_404(Item, pk=pk )
-    order_qs = Order.objects.filter(
-        user=request.user, 
-        ordered=False
-    )
+    item = get_object_or_404(Item, pk=pk)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
     if order_qs.exists():
         order = order_qs[0]
         if order.items.filter(item__pk=item.pk).exists():
             order_item = OrderItem.objects.filter(
-                item=item,
-                user=request.user,
-                ordered=False
+                item=item, user=request.user, ordered=False
             )[0]
             order_item.delete()
-            messages.info(request, "Item \""+order_item.item.item_name+"\" remove from your cart")
+            messages.info(
+                request,
+                'Item "' + order_item.item.item_name + '" remove from your cart',
+            )
             return redirect("core:order-summary")
         else:
             messages.info(request, "This Item not in your cart")
             return redirect("core:product", pk=pk)
     else:
-        #add message doesnt have order
+        # add message doesnt have order
         messages.info(request, "You do not have an Order")
-        return redirect("core:product", pk = pk)
+        return redirect("core:product", pk=pk)
 
 
 @login_required
 def reduce_quantity_item(request, pk):
-    item = get_object_or_404(Item, pk=pk )
-    order_qs = Order.objects.filter(
-        user = request.user, 
-        ordered = False
-    )
+    item = get_object_or_404(Item, pk=pk)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
     if order_qs.exists():
         order = order_qs[0]
-        if order.items.filter(item__pk=item.pk).exists() :
+        if order.items.filter(item__pk=item.pk).exists():
             order_item = OrderItem.objects.filter(
-                item = item,
-                user = request.user,
-                ordered = False
+                item=item, user=request.user, ordered=False
             )[0]
             if order_item.quantity > 1:
                 order_item.quantity -= 1
@@ -242,6 +239,6 @@ def reduce_quantity_item(request, pk):
             messages.info(request, "This Item not in your cart")
             return redirect("core:order-summary")
     else:
-        #add message doesnt have order
+        # add message doesnt have order
         messages.info(request, "You do not have an Order")
         return redirect("core:order-summary")
